@@ -27,6 +27,7 @@ After saving the preferences, invoke uLauncher and type your keyword followed by
 - Search existing notes: `<keyword> your search terms`
 - Create a new note: `<keyword> +Title::Optional body`
 - Open a result: hit Enter on the desired note. If the Web Clipper command fails, the extension falls back to `joplin://` URLs.
+- Typing only the keyword keeps uLauncher waiting—add search text or a `+Title::Body` payload to trigger the extension.
 
 ![Searching for a note from uLauncher](images/searchnote.png)
 
