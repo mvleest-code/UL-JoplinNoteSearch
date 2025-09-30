@@ -2,6 +2,7 @@
 import json
 import logging
 import subprocess
+import sys
 import time
 from datetime import datetime
 from pathlib import Path
@@ -32,6 +33,19 @@ DEBUG_LOG = Path(__file__).with_name("debug.log")
 _LOGGER = None
 
 
+def _sanitize_url(url: str) -> str:
+    if not url:
+        return url
+    if "token=" not in url:
+        return url
+    prefix, rest = url.split("token=", 1)
+    token_tail = rest.split("&", 1)
+    masked = "***"
+    if len(token_tail) == 1:
+        return f"{prefix}token={masked}"
+    return f"{prefix}token={masked}&{token_tail[1]}"
+
+
 def _get_logger():
     global _LOGGER
     if _LOGGER is not None:
@@ -43,12 +57,12 @@ def _get_logger():
             str(DEBUG_LOG),
             when="M",
             interval=30,
-            backupCount=1,
+            backupCount=5,
             encoding="utf-8",
         )
         handler.setLevel(logging.INFO)
         handler.setFormatter(logging.Formatter(
-            fmt="%(asctime)s %(message)s",
+            fmt='{"time":"%(asctime)s","payload":%(message)s}',
             datefmt="%Y-%m-%dT%H:%M:%SZ",
         ))
         handler.converter = time.gmtime
@@ -68,7 +82,8 @@ def _get_logger():
 
         _LOGGER = logger
         return _LOGGER
-    except Exception:
+    except Exception as exc:
+        print(f"[logging setup failed] {exc}", file=sys.stderr)
         return None
 
 
@@ -76,12 +91,20 @@ def _log(message):
     try:
         logger = _get_logger()
         if logger:
-            logger.info(message)
-    except Exception:
-        pass
+            payload = message if isinstance(message, dict) else {"message": message}
+            logger.info(json.dumps(payload, separators=(",", ":")))
+    except Exception as exc:
+        print(f"[logging failed] {exc}", file=sys.stderr)
 
 
-_log("module loaded")
+def _log_event(event, **fields):
+    payload = {"event": event}
+    if fields:
+        payload.update(fields)
+    _log(payload)
+
+
+_log_event("module_loaded")
 
 
 def _format_snippet(text):
@@ -98,7 +121,7 @@ def _fetch_json(url, *, method="GET", payload=None):
         data = json.dumps(payload).encode("utf-8")
         headers["Content-Type"] = "application/json"
 
-    _log(f"fetch {method} {url}")
+    _log_event("fetch", method=method, url=_sanitize_url(url))
     request = Request(url, data=data, headers=headers, method=method)
     with urlopen(request, timeout=TIMEOUT_SECONDS) as response:
         body = response.read().decode("utf-8")
@@ -113,7 +136,7 @@ def _search_notes(host, token, query):
         "type": "note",
     })
     url = f"{host}/search?{params}"
-    _log(f"search notes query='{query}' host='{host}'")
+    _log_event("search_notes", query_length=len(query), host=host)
     return _fetch_json(url).get("items", [])
 
 
@@ -123,7 +146,7 @@ def _create_note(host, token, title, body):
     if body:
         payload["body"] = body
     url = f"{host}/notes?{params}"
-    _log(f"create note '{title}' host='{host}' body_len={len(body)}")
+    _log_event("create_note_request", host=host, title=title, body_length=len(body))
     return _fetch_json(url, method="POST", payload=payload)
 
 
@@ -131,7 +154,10 @@ def _execute_command(host, token, command_type, **kwargs):
     params = urlencode({"token": token})
     payload = {"type": command_type, **kwargs}
     url = f"{host}/commands?{params}"
-    _log(f"command {command_type} payload={kwargs}")
+    redacted_kwargs = dict(kwargs)
+    if "token" in redacted_kwargs:
+        redacted_kwargs["token"] = "***"
+    _log_event("command_request", command=command_type, details=redacted_kwargs)
     return _fetch_json(url, method="POST", payload=payload)
 
 
@@ -141,11 +167,11 @@ def _open_note(host, token, note_id):
 
 def _open_note_url(note_id):
     url = f"joplin://x-callback-url/openNote?id={note_id}"
-    _log(f"fallback open via url {url}")
+    _log_event("fallback_open_url", url=url)
     try:
         subprocess.Popen(["xdg-open", url])
     except Exception as exc:
-        _log(f"fallback command failed: {exc}")
+        _log_event("fallback_open_failed", error=str(exc))
         return OpenUrlAction(url)
     return HideWindowAction()
 
@@ -187,28 +213,28 @@ class JoplinSearchExtension(Extension):
         super(JoplinSearchExtension, self).__init__()
         self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
         self.subscribe(ItemEnterEvent, ItemEnterEventListener())
-        _log("extension initialized")
+        _log_event("extension_initialized")
 
 
 class KeywordQueryEventListener(EventListener):
     def on_event(self, event, extension):
         query = (event.get_argument() or "").strip()
-        _log(f"keyword event received argument='{query}'")
+        _log_event("keyword_event", length=len(query))
         host = (extension.preferences.get("joplin_host") or DEFAULT_HOST).rstrip("/")
         token = (extension.preferences.get("joplin_token") or "").strip()
 
         if not query:
-            _log("empty query")
+            _log_event("keyword_empty")
             return RenderResultListAction([_empty_query_item()])
 
         if query.startswith("+"):
             if not token:
-                _log("missing token when adding note")
+                _log_event("add_note_missing_token")
                 return RenderResultListAction([_missing_token_item()])
 
             note_text = query[1:].strip()
             if not note_text:
-                _log("note creation requested without title")
+                _log_event("add_note_missing_title")
                 return RenderResultListAction([
                     ExtensionResultItem(
                         icon=ICON_PATH,
@@ -218,7 +244,6 @@ class KeywordQueryEventListener(EventListener):
                 ])
 
             title, body = _parse_note_payload(note_text)
-            _log(f"note creation prepared title='{title}' body_len={len(body)}")
             description = _format_snippet(body) or "Press Enter to create this note in Joplin"
             return RenderResultListAction([
                 ExtensionResultItem(
@@ -237,23 +262,23 @@ class KeywordQueryEventListener(EventListener):
             ])
 
         if not token:
-            _log("missing token when searching")
+            _log_event("search_missing_token")
             return RenderResultListAction([_missing_token_item()])
 
         try:
             notes = _search_notes(host, token, query)
         except (HTTPError, URLError) as exc:
-            _log(f"search connection error: {exc}")
+            _log_event("search_error", error=str(exc), kind="connection")
             return RenderResultListAction([_error_item("Cannot reach Joplin", str(exc))])
         except ValueError as exc:
-            _log(f"search invalid response: {exc}")
+            _log_event("search_error", error=str(exc), kind="invalid_response")
             return RenderResultListAction([_error_item("Invalid response from Joplin", str(exc))])
         except Exception as exc:  # pragma: no cover - catch-all for unexpected errors
-            _log(f"search unexpected error: {exc}")
+            _log_event("search_error", error=str(exc), kind="unexpected")
             return RenderResultListAction([_error_item("Unexpected error", str(exc))])
 
         if not notes:
-            _log("search returned no notes")
+            _log_event("search_no_results", query_length=len(query))
             return RenderResultListAction([
                 ExtensionResultItem(
                     icon=ICON_PATH,
@@ -287,9 +312,10 @@ class KeywordQueryEventListener(EventListener):
 class ItemEnterEventListener(EventListener):
     def on_event(self, event, extension):
         data = event.get_data()
-        _log(f"item enter event data={data}")
+        event_type = data.get("type") if isinstance(data, dict) else None
+        _log_event("item_enter", event_type=event_type)
         if not isinstance(data, dict):
-            _log("item enter ignored: not dict")
+            _log_event("item_enter_ignored", reason="not_dict")
             return None
 
         action_type = data.get("type")
@@ -300,35 +326,35 @@ class ItemEnterEventListener(EventListener):
         if action_type == "open-note":
             note_id = data.get("note_id")
             if not note_id:
-                _log("open-note missing note_id")
+                _log_event("open_note_missing_id")
                 return None
 
             if not token:
-                _log("open-note missing token")
+                _log_event("open_note_missing_token")
                 return _open_note_url(note_id)
 
             try:
-                _log(f"requesting Joplin openNote id={note_id}")
+                _log_event("open_note_request", note_id=note_id)
                 _open_note(host, token, note_id)
-                _log(f"openNote command accepted for id={note_id}")
+                _log_event("open_note_success", note_id=note_id)
             except (HTTPError, URLError) as exc:
-                _log(f"open note connection error: {exc}")
+                _log_event("open_note_error", error=str(exc), kind="connection")
                 return _open_note_url(note_id)
             except ValueError as exc:
-                _log(f"open note invalid response: {exc}")
+                _log_event("open_note_error", error=str(exc), kind="invalid_response")
                 return _open_note_url(note_id)
             except Exception as exc:  # pragma: no cover
-                _log(f"open note unexpected error: {exc}")
+                _log_event("open_note_error", error=str(exc), kind="unexpected")
                 return _open_note_url(note_id)
 
             return HideWindowAction()
 
         if action_type != "create-note":
-            _log("item enter ignored: unsupported type")
+            _log_event("item_enter_ignored", reason="unsupported_type", event_type=action_type)
             return None
 
         if not token:
-            _log("item enter missing token")
+            _log_event("create_note_missing_token")
             return RenderResultListAction([_missing_token_item()])
 
         title = data.get("title") or "Untitled note"
@@ -337,13 +363,13 @@ class ItemEnterEventListener(EventListener):
         try:
             created_note = _create_note(host, token, title, body)
         except (HTTPError, URLError) as exc:
-            _log(f"create note connection error: {exc}")
+            _log_event("create_note_error", error=str(exc), kind="connection")
             return RenderResultListAction([_error_item("Cannot reach Joplin", str(exc))])
         except ValueError as exc:
-            _log(f"create note invalid response: {exc}")
+            _log_event("create_note_error", error=str(exc), kind="invalid_response")
             return RenderResultListAction([_error_item("Invalid response from Joplin", str(exc))])
         except Exception as exc:  # pragma: no cover - catch-all for unexpected errors
-            _log(f"create note unexpected error: {exc}")
+            _log_event("create_note_error", error=str(exc), kind="unexpected")
             return RenderResultListAction([_error_item("Unexpected error", str(exc))])
 
         note_id = (created_note or {}).get("id")
