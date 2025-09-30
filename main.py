@@ -1,11 +1,15 @@
 
 import json
+import logging
 import subprocess
+import time
 from datetime import datetime
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
+
+from logging.handlers import TimedRotatingFileHandler
 
 from ulauncher.api.client.Extension import Extension
 from ulauncher.api.client.EventListener import EventListener
@@ -26,15 +30,56 @@ DEFAULT_HOST = "http://127.0.0.1:41184"
 
 DEBUG_LOG = Path(__file__).with_name("debug.log")
 _DEBUG_ENABLED = True
+_LOGGER = None
+
+
+def _get_logger():
+    global _LOGGER
+    if _LOGGER is not None:
+        return _LOGGER
+
+    try:
+        DEBUG_LOG.parent.mkdir(parents=True, exist_ok=True)
+        handler = TimedRotatingFileHandler(
+            str(DEBUG_LOG),
+            when="H",
+            interval=1,
+            backupCount=1,
+            encoding="utf-8",
+        )
+        handler.setLevel(logging.INFO)
+        handler.setFormatter(logging.Formatter(
+            fmt="%(asctime)s %(message)s",
+            datefmt="%Y-%m-%dT%H:%M:%SZ",
+        ))
+        handler.converter = time.gmtime
+
+        logger = logging.getLogger("joplin_note_search")
+        logger.setLevel(logging.INFO)
+        logger.propagate = False
+
+        for existing in list(logger.handlers):
+            logger.removeHandler(existing)
+            try:
+                existing.close()
+            except Exception:
+                pass
+
+        logger.addHandler(handler)
+
+        _LOGGER = logger
+        return _LOGGER
+    except Exception:
+        return None
 
 
 def _log(message, *, force=False):
     if not (_DEBUG_ENABLED or force):
         return
     try:
-        timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-        with DEBUG_LOG.open("a", encoding="utf-8") as debug_file:
-            debug_file.write(f"{timestamp} {message}\n")
+        logger = _get_logger()
+        if logger:
+            logger.info(message)
     except Exception:
         pass
 
