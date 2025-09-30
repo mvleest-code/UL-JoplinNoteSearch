@@ -1,7 +1,6 @@
 [
-	{
-		"required_api_version": "2",
-		"commit": "b1cd4238b607c56890cdf29230470cbe2bd7b767"
-	}
+  {
+    "required_api_version": "2",
+    "commit": "e467303fcc129c0396aa476e528de4d29b75dcea"
+  }
 ]
-
