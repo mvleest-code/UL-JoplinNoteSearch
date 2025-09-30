@@ -25,47 +25,61 @@ SNIPPET_MAX_LENGTH = 120
 DEFAULT_HOST = "http://127.0.0.1:41184"
 
 
-# Helper to get the debug log path, optionally from user preferences
-def _get_debug_log_path(prefs=None):
-    # If user set a path in preferences, use it
-    if prefs:
-        user_path = (prefs.get("debug_log_path") or "").strip()
-        if user_path:
-            try:
-                log_path = Path(os.path.expanduser(user_path))
-                log_path.parent.mkdir(parents=True, exist_ok=True)
-                return log_path
-            except Exception:
-                pass
-    # Otherwise use the extension cache dir
+_DEBUG_ENABLED = False
+_DEBUG_LOG_PATH = None
+
+
+def _compute_default_log_path():
     try:
         ext_id = os.environ.get("EXTENSION_UUID")
         if not ext_id:
             raise RuntimeError("EXTENSION_UUID not set")
-        cache_dir = os.path.join(
-            os.path.expanduser("~/.cache/ulauncher_cache/extensions"),
-            ext_id
-        )
-        os.makedirs(cache_dir, exist_ok=True)
-        return Path(os.path.join(cache_dir, "debug.log"))
+        cache_dir = Path("~/.cache/ulauncher_cache/extensions").expanduser() / ext_id
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        return cache_dir / "debug.log"
     except Exception:
-        return Path(os.path.expanduser("~/.UL-JoplinNoteSearch-debug.log"))
-
-def _log(message):
-
-_DEBUG_ENABLED = False
+        return Path("~/.UL-JoplinNoteSearch-debug.log").expanduser()
 
 
-def _log(message, prefs=None):
-    if not _DEBUG_ENABLED:
+def _resolve_log_path(prefs=None):
+    global _DEBUG_LOG_PATH
+    if _DEBUG_LOG_PATH is not None:
+        return _DEBUG_LOG_PATH
+
+    user_path = ""
+    try:
+        if prefs and hasattr(prefs, "get"):
+            user_path = (prefs.get("debug_log_path") or "").strip()
+    except Exception:
+        user_path = ""
+
+    if user_path:
+        try:
+            candidate = Path(os.path.expanduser(user_path))
+            candidate.parent.mkdir(parents=True, exist_ok=True)
+            _DEBUG_LOG_PATH = candidate
+            return _DEBUG_LOG_PATH
+        except Exception:
+            pass
+
+    _DEBUG_LOG_PATH = _compute_default_log_path()
+    return _DEBUG_LOG_PATH
+
+
+def _write_log_line(message, prefs=None, force=False):
+    if not (_DEBUG_ENABLED or force):
         return
     try:
-        log_path = _get_debug_log_path(prefs)
+        log_path = _resolve_log_path(prefs)
         timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         with log_path.open("a", encoding="utf-8") as debug_file:
             debug_file.write(f"{timestamp} {message}\n")
     except Exception:
         pass
+
+
+def _log(message, prefs=None):
+    _write_log_line(message, prefs)
 
 
 _log("module loaded")
@@ -182,21 +196,18 @@ class JoplinSearchExtension(Extension):
     @staticmethod
     def _update_logging_flag(prefs):
         global _DEBUG_ENABLED
-        value = (prefs.get("enable_debug") or "").strip().lower()
+        value = ""
+        if prefs and hasattr(prefs, "get"):
+            raw = prefs.get("enable_debug", "")
+            value = str(raw).strip().lower()
         enable_debug = value in {"true", "1", "yes", "on"}
         previous = _DEBUG_ENABLED
         _DEBUG_ENABLED = enable_debug
         if enable_debug and not previous:
-            log_path = _get_debug_log_path(prefs)
-            _log(f"debug logging enabled. Log path: {log_path}", prefs)
+            log_path = _resolve_log_path(prefs)
+            _write_log_line(f"debug logging enabled. Log path: {log_path}", prefs, force=True)
         if not enable_debug and previous:
-            try:
-                log_path = _get_debug_log_path(prefs)
-                with log_path.open("a", encoding="utf-8") as debug_file:
-                    timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-                    debug_file.write(f"{timestamp} debug logging disabled\n")
-            except Exception:
-                pass
+            _write_log_line("debug logging disabled", prefs, force=True)
 
 
 class KeywordQueryEventListener(EventListener):
