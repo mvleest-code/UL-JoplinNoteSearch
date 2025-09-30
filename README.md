@@ -33,7 +33,7 @@ Search, preview, and create notes in [Joplin](https://joplinapp.org/) straight f
 - Create a note inline: `<keyword> +Title::Optional body`
 - Open a result: press Enter — the extension tries the Web Clipper command first, then falls back to a `joplin://` URL if needed
 - Typing only the keyword keeps uLauncher waiting; add a query or `+Title::Body` payload to trigger actions
-- Debug logging is enabled by default (writes to `debug.log` next to `main.py`, rotated hourly); switch off **Enable debug logging** in preferences if you want fewer traces
+- Debug logging is always on (writes to `debug.log` next to `main.py`, rotated every 30 minutes to keep the file small)
 
 ![Searching for a note from uLauncher](images/searchnote.png)
 
@@ -44,7 +44,7 @@ Search, preview, and create notes in [Joplin](https://joplinapp.org/) straight f
 - **HTTP 403/401 errors** → The API token is missing or incorrect. Regenerate it in Joplin and update the extension preferences.
 - **Open note fails** → The note ID may not exist or Joplin refused the command; the extension automatically falls back to a `joplin://` link.
 - **Keyword does nothing** → The keyword field must be saved in uLauncher preferences. Reopen settings, enter your keyword (e.g., `note`), save, and try again.
-- **Need fewer logs?** → Disable the **Enable debug logging** setting, reproduce the behaviour, then re-enable it when you’re done collecting details.
+- **Need fewer logs?** → Feel free to delete `debug.log`; it is recreated automatically and rotation ensures it never grows beyond the most recent hour.
 
 ***
 
