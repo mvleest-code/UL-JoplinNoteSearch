@@ -32,6 +32,13 @@
             "name": "Joplin API Token",
             "description": "Paste your Joplin Web Clipper token",
             "default_value": ""
+        },
+        {
+            "id": "support_link",
+            "type": "input",
+            "name": "Support this extension",
+            "description": "Copy the Buy Me a Coffee link below if you'd like to support continued development",
+            "default_value": "https://www.buymeacoffee.com/mvleest.code"
         }
     ]
 }
