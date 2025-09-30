@@ -12,3 +12,4 @@ scripts/release.sh
 # Editors
 .idea/
 .vscode/
+tmp.json
