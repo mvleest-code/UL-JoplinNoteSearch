@@ -42,10 +42,14 @@
         },
         {
             "id": "enable_debug",
-            "type": "checkbox",
+            "type": "select",
             "name": "Enable debug logging",
             "description": "Write detailed events to debug.log for troubleshooting",
-            "default_value": "false"
+            "default_value": "false",
+            "options": [
+                { "value": "false", "text": "Disabled" },
+                { "value": "true", "text": "Enabled" }
+            ]
         }
     ]
 }
