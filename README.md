@@ -1,6 +1,6 @@
-# Joplin Note Search for Ulauncher
+# Joplin Note Search for uLauncher
 
-Joplin Note Search lets you browse and create notes in [Joplin](https://joplinapp.org/) directly from the Ulauncher prompt by talking to the Web Clipper API.
+Joplin Note Search lets you browse and create notes in [Joplin](https://joplinapp.org/) directly from the uLauncher prompt by talking to the Web Clipper API.
 
 ## Features
 - Search Joplin notes with fuzzy matching and quick preview snippets
@@ -9,17 +9,17 @@ Joplin Note Search lets you browse and create notes in [Joplin](https://joplinap
 - Configurable keyword, host, and API token via extension preferences
 
 ## Requirements
-- [Ulauncher](https://ulauncher.io/) v5 with extension API v2
+- [uLauncher](https://ulauncher.io/) v5 with extension API v2
 - [Joplin](https://joplinapp.org/) desktop app with the Web Clipper service enabled
 - Joplin Web Clipper API token (Tools → Options → Web Clipper)
 
 ## Installation
-1. Open Ulauncher preferences → Extensions.
+1. Open uLauncher preferences → Extensions.
 2. Click **Add extension** and paste `https://github.com/mvleest-code/UL-JoplinNoteSearch`.
 3. After it installs, open the extension settings.
 4. Set your desired keyword, API host, and paste the Web Clipper token.
 
-After saving the preferences, invoke Ulauncher and type your keyword followed by a search query.
+After saving the preferences, invoke uLauncher and type your keyword followed by a search query.
 
 ![Extension settings showing configurable keyword, host, and token fields](images/settings.png)
 
@@ -30,7 +30,7 @@ After saving the preferences, invoke Ulauncher and type your keyword followed by
 
 ## Development
 ```bash
-# Install or link the extension in the local Ulauncher directory
+# Install or link the extension in the local uLauncher directory
 mkdir -p ~/.local/share/ulauncher/extensions
 ln -s $(pwd) ~/.local/share/ulauncher/extensions/com.github.mvleest-code.joplin-search
 
@@ -46,7 +46,7 @@ To prepare a release archive:
 ./scripts/package.sh
 ```
 
-The script creates `dist/joplin-note-search.zip`, ready to attach to a GitHub release if you prefer manual distribution; Ulauncher can also install directly from the repository URL.
+The script creates `dist/joplin-note-search.zip`, ready to attach to a GitHub release if you prefer manual distribution; uLauncher can also install directly from the repository URL.
 
 ## License
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
