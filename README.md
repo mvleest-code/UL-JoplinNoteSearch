@@ -68,6 +68,7 @@ To prepare a release archive:
 
 The script creates `dist/ul-joplinnotesearch.zip`, ready to attach to a GitHub release if you prefer manual distribution; uLauncher can also install directly from the repository URL.
 
+If this saves you a little time (or sparks ideas for your own workflow), consider fueling future updates with a coffee:
 <a href="https://www.buymeacoffee.com/mvleestapp" target="_blank">
   <img
     src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
