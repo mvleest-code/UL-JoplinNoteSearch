@@ -4,7 +4,7 @@ Joplin Note Search lets you browse and create notes in [Joplin](https://joplinap
 
 If this saves you a little time (or sparks ideas for your own workflow), consider fueling future updates with a coffee:
 
-<a href="https://www.buymeacoffee.com/mvleestapp" target="_blank">
+<a href="https://www.buymeacoffee.com/mvleest.code" target="_blank">
   <img
     src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
     alt="Buy Me A Coffee"
