@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "Joplin Note Search",
     "description": "Search and create Joplin notes using the Web Clipper API",
-    "version": "0.1.20",
+    "version": "0.1.21",
     "developer_name": "mvleest-code",
     "license": "MIT",
     "icon": "images/icon.png",
@@ -47,8 +47,14 @@
             "description": "Write detailed events to debug.log for troubleshooting",
             "default_value": "false",
             "options": [
-                { "value": "false", "text": "Disabled" },
-                { "value": "true", "text": "Enabled" }
+                {
+                    "value": "false",
+                    "text": "Disabled"
+                },
+                {
+                    "value": "true",
+                    "text": "Enabled"
+                }
             ]
         }
     ]
