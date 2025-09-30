@@ -26,11 +26,6 @@ Search, preview, and create notes in [Joplin](https://joplinapp.org/) straight f
 2. Click **Add extension** and paste `https://github.com/mvleest-code/UL-JoplinNoteSearch`.
 3. Open the new entry’s preferences and fill in the keyword, host, and API token.
 
-### Manual install from ZIP (optional)
-1. Run `./scripts/package.sh` to generate `dist/ul-joplinnotesearch.zip`.
-2. Extract it into `~/.local/share/ulauncher/extensions/com.github.mvleest-code.ul-joplinnotesearch`.
-3. Restart uLauncher (or reload extensions) and configure the preferences.
-
 ![Extension settings showing configurable keyword, host, and token fields](images/settings.png)
 
 ## Usage
@@ -52,7 +47,7 @@ Search, preview, and create notes in [Joplin](https://joplinapp.org/) straight f
 ## Updates & Releases
 - The `manifest.json` `version` field tracks the release number. Bump it when shipping new behavior.
 - `versions.json` maps uLauncher’s API version to a specific commit SHA. Update it after pushing and tag a release (e.g., `v0.1.0`) so others can install a known-good snapshot.
-- Attach `dist/ul-joplinnotesearch.zip` to each GitHub release for users who prefer manual installs.
+***
 
 ## Development
 ```bash
@@ -64,11 +59,7 @@ ln -s $(pwd) ~/.local/share/ulauncher/extensions/com.github.mvleest-code.ul-jopl
 ulauncher -v
 ```
 
-Logs are written to `debug.log` in the project root (git-ignored). The packaging script regenerates the distributable archive:
-
-```bash
-./scripts/package.sh
-```
+Logs are written to `debug.log` in the project root (git-ignored).
 
 ## Contributing
 Issues, feature ideas, and pull requests are welcome! A `CONTRIBUTING.md` and issue templates are on the roadmap — in the meantime, open an issue with as much context as possible and I’ll gladly collaborate.
