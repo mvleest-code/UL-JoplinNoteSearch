@@ -2,6 +2,17 @@
 
 Joplin Note Search lets you browse and create notes in [Joplin](https://joplinapp.org/) directly from the uLauncher prompt by talking to the Web Clipper API.
 
+If this saves you a little time (or sparks ideas for your own workflow), consider fueling future updates with a coffee:
+
+<a href="https://www.buymeacoffee.com/mvleestapp" target="_blank">
+  <img
+    src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+    alt="Buy Me A Coffee"
+    height="60"
+    width="217"
+  />
+</a>
+
 ## Features
 - Search Joplin notes with fuzzy matching and quick preview snippets
 - Create new notes inline with `+Title::Body` syntax
@@ -10,8 +21,12 @@ Joplin Note Search lets you browse and create notes in [Joplin](https://joplinap
 
 ## Requirements
 - [uLauncher](https://ulauncher.io/) v5 with extension API v2
-- [Joplin](https://joplinapp.org/) desktop app with the Web Clipper service enabled
+- [Joplin](https://joplinapp.org/) desktop app running on your machine with the Web Clipper service enabled
 - Joplin Web Clipper API token (Tools → Options → Web Clipper)
+
+Make sure the Joplin desktop app stays open and the Web Clipper switch is turned on before invoking the extension.
+
+![Joplin Web Clipper settings showing service enabled and token](images/enablewebclipper.png)
 
 ## Installation
 1. Open uLauncher preferences → Extensions.
@@ -52,6 +67,15 @@ To prepare a release archive:
 ```
 
 The script creates `dist/ul-joplinnotesearch.zip`, ready to attach to a GitHub release if you prefer manual distribution; uLauncher can also install directly from the repository URL.
+
+<a href="https://www.buymeacoffee.com/mvleestapp" target="_blank">
+  <img
+    src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+    alt="Buy Me A Coffee"
+    height="60"
+    width="217"
+  />
+</a>
 
 ## License
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
