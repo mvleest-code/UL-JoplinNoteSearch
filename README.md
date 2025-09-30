@@ -2,17 +2,6 @@
 
 Joplin Note Search lets you browse and create notes in [Joplin](https://joplinapp.org/) directly from the uLauncher prompt by talking to the Web Clipper API.
 
-If this saves you a little time (or sparks ideas for your own workflow), consider fueling future updates with a coffee:
-
-<a href="https://www.buymeacoffee.com/mvleest.code" target="_blank">
-  <img
-    src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
-    alt="Buy Me A Coffee"
-    height="60"
-    width="217"
-  />
-</a>
-
 ## Features
 - Search Joplin notes with fuzzy matching and quick preview snippets
 - Create new notes inline with `+Title::Body` syntax
@@ -67,6 +56,17 @@ To prepare a release archive:
 ```
 
 The script creates `dist/ul-joplinnotesearch.zip`, ready to attach to a GitHub release if you prefer manual distribution; uLauncher can also install directly from the repository URL.
+
+If this saves you a little time (or sparks ideas for your own workflow), consider fueling future updates with a coffee:
+
+<a href="https://www.buymeacoffee.com/mvleest.code" target="_blank">
+  <img
+    src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+    alt="Buy Me A Coffee"
+    height="60"
+    width="217"
+  />
+</a>
 
 ## License
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
