@@ -33,7 +33,7 @@ Search, preview, and create notes in [Joplin](https://joplinapp.org/) straight f
 - Create a note inline: `<keyword> +Title::Optional body`
 - Open a result: press Enter — the extension tries the Web Clipper command first, then falls back to a `joplin://` URL if needed
 - Typing only the keyword keeps uLauncher waiting; add a query or `+Title::Body` payload to trigger actions
-- Debug logging is enabled by default (writes to `debug.log` next to `main.py`); switch off **Enable debug logging** in preferences if you want fewer traces
+- Debug logging is enabled by default (writes to `debug.log` next to `main.py`, rotated hourly); switch off **Enable debug logging** in preferences if you want fewer traces
 
 ![Searching for a note from uLauncher](images/searchnote.png)
 
