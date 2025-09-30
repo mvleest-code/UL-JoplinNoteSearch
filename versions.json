@@ -72,5 +72,10 @@
     "required_api_version": "2",
     "commit": "b2188ce51570f0ed13667d0a8248e4227f4da051",
     "version": "v0.1.33"
+  },
+  {
+    "required_api_version": "2",
+    "commit": "15e50027e59ff7d2e9b1328d4e4428bab810e912",
+    "version": "v0.1.34"
   }
 ]
