@@ -1,0 +1,13 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Logs
+*.log
+
+# Release artifacts
+dist/
+
+# Editors
+.idea/
+.vscode/

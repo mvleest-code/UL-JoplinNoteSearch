@@ -1,0 +1,36 @@
+{
+    "manifest_version": 2,
+    "name": "Joplin Note Search",
+    "description": "Search and create Joplin notes using the Web Clipper API",
+    "version": "0.1.0",
+    "developer_name": "mvleest-code",
+    "license": "MIT",
+    "icon": "images/icon.png",
+    "required_api_version": "^2.0.0",
+    "options": {
+        "query_debounce": 0.1
+    },
+    "preferences": [
+        {
+            "id": "main_kw",
+            "type": "keyword",
+            "name": "Search keyword",
+            "description": "Keyword to start a Joplin search (e.g. 'note')",
+            "default_value": "note"
+        },
+        {
+            "id": "joplin_host",
+            "type": "input",
+            "name": "Joplin Web Clipper Host",
+            "description": "Defaults to http://127.0.0.1:41184",
+            "default_value": "http://127.0.0.1:41184"
+        },
+        {
+            "id": "joplin_token",
+            "type": "input",
+            "name": "Joplin API Token",
+            "description": "Paste your Joplin Web Clipper token",
+            "default_value": ""
+        }
+    ]
+}
