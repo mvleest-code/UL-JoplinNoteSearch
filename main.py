@@ -1,4 +1,6 @@
+
 import json
+import os
 import subprocess
 from datetime import datetime
 from pathlib import Path
@@ -15,28 +17,55 @@ from ulauncher.api.shared.action.OpenUrlAction import OpenUrlAction
 from ulauncher.api.shared.action.ExtensionCustomAction import ExtensionCustomAction
 from ulauncher.api.shared.action.HideWindowAction import HideWindowAction
 
+
 ICON_PATH = "images/icon.png"
-DEBUG_LOG = Path(__file__).with_name("debug.log")
 SEARCH_LIMIT = 10
 TIMEOUT_SECONDS = 3
 SNIPPET_MAX_LENGTH = 120
 DEFAULT_HOST = "http://127.0.0.1:41184"
 
 
+# Helper to get the debug log path, optionally from user preferences
+def _get_debug_log_path(prefs=None):
+    # If user set a path in preferences, use it
+    if prefs:
+        user_path = (prefs.get("debug_log_path") or "").strip()
+        if user_path:
+            try:
+                log_path = Path(os.path.expanduser(user_path))
+                log_path.parent.mkdir(parents=True, exist_ok=True)
+                return log_path
+            except Exception:
+                pass
+    # Otherwise use the extension cache dir
+    try:
+        ext_id = os.environ.get("EXTENSION_UUID")
+        if not ext_id:
+            raise RuntimeError("EXTENSION_UUID not set")
+        cache_dir = os.path.join(
+            os.path.expanduser("~/.cache/ulauncher_cache/extensions"),
+            ext_id
+        )
+        os.makedirs(cache_dir, exist_ok=True)
+        return Path(os.path.join(cache_dir, "debug.log"))
+    except Exception:
+        return Path(os.path.expanduser("~/.UL-JoplinNoteSearch-debug.log"))
+
 def _log(message):
-    # Only log when the toggle is enabled in preferences
-    enable_debug = getattr(_log, "enabled", False)
-    if not enable_debug:
+
+_DEBUG_ENABLED = False
+
+
+def _log(message, prefs=None):
+    if not _DEBUG_ENABLED:
         return
     try:
+        log_path = _get_debug_log_path(prefs)
         timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-        with DEBUG_LOG.open("a", encoding="utf-8") as debug_file:
+        with log_path.open("a", encoding="utf-8") as debug_file:
             debug_file.write(f"{timestamp} {message}\n")
     except Exception:
         pass
-
-
-_log.enabled = False
 
 
 _log("module loaded")
@@ -140,11 +169,11 @@ def _error_item(name, description):
 
 
 class JoplinSearchExtension(Extension):
+
     def __init__(self):
         super(JoplinSearchExtension, self).__init__()
         self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
         self.subscribe(ItemEnterEvent, ItemEnterEventListener())
-
         self._update_logging_flag(self.preferences)
 
     def on_preferences_update(self, prefs):
@@ -152,15 +181,18 @@ class JoplinSearchExtension(Extension):
 
     @staticmethod
     def _update_logging_flag(prefs):
+        global _DEBUG_ENABLED
         value = (prefs.get("enable_debug") or "").strip().lower()
         enable_debug = value in {"true", "1", "yes", "on"}
-        previous = getattr(_log, "enabled", False)
-        _log.enabled = enable_debug
+        previous = _DEBUG_ENABLED
+        _DEBUG_ENABLED = enable_debug
         if enable_debug and not previous:
-            _log("debug logging enabled")
+            log_path = _get_debug_log_path(prefs)
+            _log(f"debug logging enabled. Log path: {log_path}", prefs)
         if not enable_debug and previous:
             try:
-                with DEBUG_LOG.open("a", encoding="utf-8") as debug_file:
+                log_path = _get_debug_log_path(prefs)
+                with log_path.open("a", encoding="utf-8") as debug_file:
                     timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
                     debug_file.write(f"{timestamp} debug logging disabled\n")
             except Exception:
