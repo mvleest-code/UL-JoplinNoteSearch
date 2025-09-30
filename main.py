@@ -1,6 +1,5 @@
 
 import json
-import os
 import subprocess
 from datetime import datetime
 from pathlib import Path
@@ -25,64 +24,22 @@ SNIPPET_MAX_LENGTH = 120
 DEFAULT_HOST = "http://127.0.0.1:41184"
 
 
+DEBUG_LOG = Path(__file__).with_name("debug.log")
 _DEBUG_ENABLED = False
-_DEBUG_LOG_PATH = None
 
 
-def _compute_default_log_path():
-    try:
-        ext_id = os.environ.get("EXTENSION_UUID")
-        if not ext_id:
-            raise RuntimeError("EXTENSION_UUID not set")
-        cache_dir = Path("~/.cache/ulauncher_cache/extensions").expanduser() / ext_id
-        cache_dir.mkdir(parents=True, exist_ok=True)
-        return cache_dir / "debug.log"
-    except Exception:
-        return Path("~/.UL-JoplinNoteSearch-debug.log").expanduser()
-
-
-def _resolve_log_path(prefs=None):
-    global _DEBUG_LOG_PATH
-    if _DEBUG_LOG_PATH is not None:
-        return _DEBUG_LOG_PATH
-
-    user_path = ""
-    try:
-        if prefs and hasattr(prefs, "get"):
-            user_path = (prefs.get("debug_log_path") or "").strip()
-    except Exception:
-        user_path = ""
-
-    if user_path:
-        try:
-            candidate = Path(os.path.expanduser(user_path))
-            candidate.parent.mkdir(parents=True, exist_ok=True)
-            _DEBUG_LOG_PATH = candidate
-            return _DEBUG_LOG_PATH
-        except Exception:
-            pass
-
-    _DEBUG_LOG_PATH = _compute_default_log_path()
-    return _DEBUG_LOG_PATH
-
-
-def _write_log_line(message, prefs=None, force=False):
+def _log(message, *, force=False):
     if not (_DEBUG_ENABLED or force):
         return
     try:
-        log_path = _resolve_log_path(prefs)
         timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-        with log_path.open("a", encoding="utf-8") as debug_file:
+        with DEBUG_LOG.open("a", encoding="utf-8") as debug_file:
             debug_file.write(f"{timestamp} {message}\n")
     except Exception:
         pass
 
 
-def _log(message, prefs=None):
-    _write_log_line(message, prefs)
-
-
-_log("module loaded")
+_log("module loaded", force=True)
 
 
 def _format_snippet(text):
@@ -204,10 +161,9 @@ class JoplinSearchExtension(Extension):
         previous = _DEBUG_ENABLED
         _DEBUG_ENABLED = enable_debug
         if enable_debug and not previous:
-            log_path = _resolve_log_path(prefs)
-            _write_log_line(f"debug logging enabled. Log path: {log_path}", prefs, force=True)
+            _log("debug logging enabled", force=True)
         if not enable_debug and previous:
-            _write_log_line("debug logging disabled", prefs, force=True)
+            _log("debug logging disabled", force=True)
 
 
 class KeywordQueryEventListener(EventListener):
