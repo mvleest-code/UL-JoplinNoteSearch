@@ -46,9 +46,6 @@ Search, preview, and create notes in [Joplin](https://joplinapp.org/) straight f
 - **Keyword does nothing** → The keyword field must be saved in uLauncher preferences. Reopen settings, enter your keyword (e.g., `note`), save, and try again.
 - **Need more logs?** → Enable the **Enable debug logging** checkbox, reproduce the issue, then disable it to keep the log file small.
 
-## Updates & Releases
-- The `manifest.json` `version` field tracks the release number. Bump it when shipping new behavior.
-- `versions.json` maps uLauncher’s API version to a specific commit SHA. Update it after pushing and tag a release (e.g., `v0.1.0`) so others can install a known-good snapshot.
 ***
 
 ## Development
