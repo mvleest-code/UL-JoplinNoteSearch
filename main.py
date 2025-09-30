@@ -25,7 +25,7 @@ DEFAULT_HOST = "http://127.0.0.1:41184"
 
 
 DEBUG_LOG = Path(__file__).with_name("debug.log")
-_DEBUG_ENABLED = False
+_DEBUG_ENABLED = True
 
 
 def _log(message, *, force=False):

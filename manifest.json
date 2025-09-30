@@ -45,7 +45,7 @@
             "type": "select",
             "name": "Enable debug logging",
             "description": "Write detailed events to debug.log for troubleshooting",
-            "default_value": "false",
+            "default_value": "true",
             "options": [
                 {
                     "value": "false",
