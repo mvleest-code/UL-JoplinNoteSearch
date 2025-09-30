@@ -152,10 +152,10 @@ class JoplinSearchExtension(Extension):
 
     @staticmethod
     def _update_logging_flag(prefs):
-        if not prefs:
-            value = ""
-        else:
-            value = (prefs.get("enable_debug") or "").strip().lower()
+        raw_value = ""
+        if prefs:
+            raw_value = prefs.get("enable_debug", "")
+        value = str(raw_value).strip().lower()
         enable_debug = value in {"true", "1", "yes", "on"}
         previous = getattr(_log, "enabled", False)
         _log.enabled = enable_debug
