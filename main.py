@@ -156,7 +156,10 @@ class JoplinSearchExtension(Extension):
         value = ""
         if prefs and hasattr(prefs, "get"):
             raw = prefs.get("enable_debug", "")
-            value = str(raw).strip().lower()
+            if isinstance(raw, bool):
+                value = "true" if raw else "false"
+            else:
+                value = str(raw).strip().lower()
         enable_debug = value in {"true", "1", "yes", "on"}
         previous = _DEBUG_ENABLED
         _DEBUG_ENABLED = enable_debug
