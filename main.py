@@ -146,6 +146,8 @@ class JoplinSearchExtension(Extension):
         self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
         self.subscribe(ItemEnterEvent, ItemEnterEventListener())
         self._update_logging_flag(self.preferences)
+        if _DEBUG_ENABLED:
+            _log("extension initialized with debug logging enabled", force=True)
 
     def on_preferences_update(self, prefs):
         self._update_logging_flag(prefs)
