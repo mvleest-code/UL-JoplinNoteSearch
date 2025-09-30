@@ -28,6 +28,10 @@ After saving the preferences, invoke uLauncher and type your keyword followed by
 - Create a new note: `<keyword> +Title::Optional body`
 - Open a result: hit Enter on the desired note. If the Web Clipper command fails, the extension falls back to `joplin://` URLs.
 
+![Searching for a note from uLauncher](images/searchnote.png)
+
+![Creating a note inline](images/addnote.png)
+
 ## Development
 ```bash
 # Install or link the extension in the local uLauncher directory
