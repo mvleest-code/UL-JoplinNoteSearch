@@ -33,7 +33,7 @@ Search, preview, and create notes in [Joplin](https://joplinapp.org/) straight f
 - Create a note inline: `<keyword> +Title::Optional body`
 - Open a result: press Enter — the extension tries the Web Clipper command first, then falls back to a `joplin://` URL if needed
 - Typing only the keyword keeps uLauncher waiting; add a query or `+Title::Body` payload to trigger actions
-- Toggle the **Enable debug logging** checkbox in preferences when you need detailed diagnostics written to `debug.log`
+- Toggle the **Enable debug logging** setting in preferences when you need detailed diagnostics written to `debug.log`
 
 ![Searching for a note from uLauncher](images/searchnote.png)
 
@@ -44,7 +44,7 @@ Search, preview, and create notes in [Joplin](https://joplinapp.org/) straight f
 - **HTTP 403/401 errors** → The API token is missing or incorrect. Regenerate it in Joplin and update the extension preferences.
 - **Open note fails** → The note ID may not exist or Joplin refused the command; the extension automatically falls back to a `joplin://` link.
 - **Keyword does nothing** → The keyword field must be saved in uLauncher preferences. Reopen settings, enter your keyword (e.g., `note`), save, and try again.
-- **Need more logs?** → Enable the **Enable debug logging** checkbox, reproduce the issue, then disable it to keep the log file small.
+- **Need more logs?** → Enable the **Enable debug logging** setting, reproduce the issue, then switch it back to keep the log file small.
 
 ***
 
