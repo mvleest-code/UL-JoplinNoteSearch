@@ -309,3 +309,4 @@ class ItemEnterEventListener(EventListener):
 
 if __name__ == "__main__":
     JoplinSearchExtension().run()
+
