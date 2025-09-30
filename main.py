@@ -24,12 +24,19 @@ DEFAULT_HOST = "http://127.0.0.1:41184"
 
 
 def _log(message):
+    # Only log when the toggle is enabled in preferences
+    enable_debug = getattr(_log, "enabled", False)
+    if not enable_debug:
+        return
     try:
         timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         with DEBUG_LOG.open("a", encoding="utf-8") as debug_file:
             debug_file.write(f"{timestamp} {message}\n")
     except Exception:
         pass
+
+
+_log.enabled = False
 
 
 _log("module loaded")
@@ -137,6 +144,27 @@ class JoplinSearchExtension(Extension):
         super(JoplinSearchExtension, self).__init__()
         self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
         self.subscribe(ItemEnterEvent, ItemEnterEventListener())
+
+        self._update_logging_flag(self.preferences)
+
+    def on_preferences_update(self, prefs):
+        self._update_logging_flag(prefs)
+
+    @staticmethod
+    def _update_logging_flag(prefs):
+        value = (prefs.get("enable_debug") or "").strip().lower()
+        enable_debug = value in {"true", "1", "yes", "on"}
+        previous = getattr(_log, "enabled", False)
+        _log.enabled = enable_debug
+        if enable_debug and not previous:
+            _log("debug logging enabled")
+        if not enable_debug and previous:
+            try:
+                with DEBUG_LOG.open("a", encoding="utf-8") as debug_file:
+                    timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+                    debug_file.write(f"{timestamp} debug logging disabled\n")
+            except Exception:
+                pass
 
 
 class KeywordQueryEventListener(EventListener):
@@ -309,4 +337,3 @@ class ItemEnterEventListener(EventListener):
 
 if __name__ == "__main__":
     JoplinSearchExtension().run()
-

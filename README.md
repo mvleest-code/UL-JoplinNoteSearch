@@ -33,6 +33,7 @@ Search, preview, and create notes in [Joplin](https://joplinapp.org/) straight f
 - Create a note inline: `<keyword> +Title::Optional body`
 - Open a result: press Enter — the extension tries the Web Clipper command first, then falls back to a `joplin://` URL if needed
 - Typing only the keyword keeps uLauncher waiting; add a query or `+Title::Body` payload to trigger actions
+- Toggle the **Enable debug logging** checkbox in preferences when you need detailed diagnostics written to `debug.log`
 
 ![Searching for a note from uLauncher](images/searchnote.png)
 
@@ -43,6 +44,7 @@ Search, preview, and create notes in [Joplin](https://joplinapp.org/) straight f
 - **HTTP 403/401 errors** → The API token is missing or incorrect. Regenerate it in Joplin and update the extension preferences.
 - **Open note fails** → The note ID may not exist or Joplin refused the command; the extension automatically falls back to a `joplin://` link.
 - **Keyword does nothing** → The keyword field must be saved in uLauncher preferences. Reopen settings, enter your keyword (e.g., `note`), save, and try again.
+- **Need more logs?** → Enable the **Enable debug logging** checkbox, reproduce the issue, then disable it to keep the log file small.
 
 ## Updates & Releases
 - The `manifest.json` `version` field tracks the release number. Bump it when shipping new behavior.
@@ -60,9 +62,6 @@ ulauncher -v
 ```
 
 Logs are written to `debug.log` in the project root (git-ignored).
-
-## Contributing
-Issues, feature ideas, and pull requests are welcome! A `CONTRIBUTING.md` and issue templates are on the roadmap — in the meantime, open an issue with as much context as possible and I’ll gladly collaborate.
 
 ## Support
 If you hit a snag or have questions, open a GitHub issue with the relevant `debug.log` excerpt and environment details (uLauncher version, Joplin version, OS). I respond as quickly as I can.
