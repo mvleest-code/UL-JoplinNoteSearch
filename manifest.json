@@ -32,11 +32,6 @@
             "name": "Joplin API Token",
             "description": "Paste your Joplin Web Clipper token",
             "default_value": ""
-        },
-        {
-            "type": "text",
-            "name": "Support this extension",
-            "description": "If this tool saves you time, you can say thanks at https://www.buymeacoffee.com/mvleest.code"
         }
     ]
 }
