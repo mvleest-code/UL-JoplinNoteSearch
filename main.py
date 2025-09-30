@@ -29,7 +29,6 @@ DEFAULT_HOST = "http://127.0.0.1:41184"
 
 
 DEBUG_LOG = Path(__file__).with_name("debug.log")
-_DEBUG_ENABLED = True
 _LOGGER = None
 
 
@@ -42,8 +41,8 @@ def _get_logger():
         DEBUG_LOG.parent.mkdir(parents=True, exist_ok=True)
         handler = TimedRotatingFileHandler(
             str(DEBUG_LOG),
-            when="H",
-            interval=1,
+            when="M",
+            interval=30,
             backupCount=1,
             encoding="utf-8",
         )
@@ -73,9 +72,7 @@ def _get_logger():
         return None
 
 
-def _log(message, *, force=False):
-    if not (_DEBUG_ENABLED or force):
-        return
+def _log(message):
     try:
         logger = _get_logger()
         if logger:
@@ -84,7 +81,7 @@ def _log(message, *, force=False):
         pass
 
 
-_log("module loaded", force=True)
+_log("module loaded")
 
 
 def _format_snippet(text):
@@ -190,30 +187,7 @@ class JoplinSearchExtension(Extension):
         super(JoplinSearchExtension, self).__init__()
         self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
         self.subscribe(ItemEnterEvent, ItemEnterEventListener())
-        self._update_logging_flag(self.preferences)
-        if _DEBUG_ENABLED:
-            _log("extension initialized with debug logging enabled", force=True)
-
-    def on_preferences_update(self, prefs):
-        self._update_logging_flag(prefs)
-
-    @staticmethod
-    def _update_logging_flag(prefs):
-        global _DEBUG_ENABLED
-        value = ""
-        if prefs and hasattr(prefs, "get"):
-            raw = prefs.get("enable_debug", "")
-            if isinstance(raw, bool):
-                value = "true" if raw else "false"
-            else:
-                value = str(raw).strip().lower()
-        enable_debug = value in {"true", "1", "yes", "on"}
-        previous = _DEBUG_ENABLED
-        _DEBUG_ENABLED = enable_debug
-        if enable_debug and not previous:
-            _log("debug logging enabled", force=True)
-        if not enable_debug and previous:
-            _log("debug logging disabled", force=True)
+        _log("extension initialized")
 
 
 class KeywordQueryEventListener(EventListener):
