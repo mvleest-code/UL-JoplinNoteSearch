@@ -287,7 +287,9 @@ class ItemEnterEventListener(EventListener):
                 return _open_note_url(note_id)
 
             try:
+                _log(f"requesting Joplin openNote id={note_id}")
                 _open_note(host, token, note_id)
+                _log(f"openNote command accepted for id={note_id}")
             except (HTTPError, URLError) as exc:
                 _log(f"open note connection error: {exc}")
                 return _open_note_url(note_id)
