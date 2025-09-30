@@ -28,5 +28,25 @@ After saving the preferences, invoke Ulauncher and type your keyword followed by
 - Create a new note: `<keyword> +Title::Optional body`
 - Open a result: hit Enter on the desired note. If the Web Clipper command fails, the extension falls back to `joplin://` URLs.
 
+## Development
+```bash
+# Install or link the extension in the local Ulauncher directory
+mkdir -p ~/.local/share/ulauncher/extensions
+ln -s $(pwd) ~/.local/share/ulauncher/extensions/com.github.mvleest-code.joplin-search
+
+# Run ulauncher with logging for debugging
+ulauncher -v
+```
+
+Logs are written to `debug.log` (ignored in git).
+
+To prepare a release archive:
+
+```bash
+./scripts/package.sh
+```
+
+The script creates `dist/joplin-note-search.zip`, ready to attach to a GitHub release if you prefer manual distribution; Ulauncher can also install directly from the repository URL.
+
 ## License
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
