@@ -3,8 +3,8 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIST_DIR="${ROOT_DIR}/dist"
-BUNDLE_NAME="com.github.mvleest-code.joplin-search"
-ZIP_NAME="joplin-note-search"
+BUNDLE_NAME="com.github.mvleest-code.ul-joplinnotesearch"
+ZIP_NAME="ul-joplinnotesearch"
 
 rm -rf "${DIST_DIR}"
 mkdir -p "${DIST_DIR}"

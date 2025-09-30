@@ -1,4 +1,4 @@
-# Joplin Note Search for uLauncher
+# UL Joplin Note Search for uLauncher
 
 Joplin Note Search lets you browse and create notes in [Joplin](https://joplinapp.org/) directly from the uLauncher prompt by talking to the Web Clipper API.
 
@@ -16,7 +16,7 @@ Joplin Note Search lets you browse and create notes in [Joplin](https://joplinap
 ## Installation
 1. Open uLauncher preferences → Extensions.
 2. Click **Add extension** and paste `https://github.com/mvleest-code/UL-JoplinNoteSearch`.
-3. After it installs, open the extension settings.
+3. After it installs, open the extension directory at `~/.local/share/ulauncher/extensions/com.github.mvleest-code.ul-joplinnotesearch` (rename if needed).
 4. Set your desired keyword, API host, and paste the Web Clipper token.
 
 After saving the preferences, invoke uLauncher and type your keyword followed by a search query.
@@ -32,7 +32,7 @@ After saving the preferences, invoke uLauncher and type your keyword followed by
 ```bash
 # Install or link the extension in the local uLauncher directory
 mkdir -p ~/.local/share/ulauncher/extensions
-ln -s $(pwd) ~/.local/share/ulauncher/extensions/com.github.mvleest-code.joplin-search
+ln -s $(pwd) ~/.local/share/ulauncher/extensions/com.github.mvleest-code.ul-joplinnotesearch
 
 # Run ulauncher with logging for debugging
 ulauncher -v
@@ -46,7 +46,7 @@ To prepare a release archive:
 ./scripts/package.sh
 ```
 
-The script creates `dist/joplin-note-search.zip`, ready to attach to a GitHub release if you prefer manual distribution; uLauncher can also install directly from the repository URL.
+The script creates `dist/ul-joplinnotesearch.zip`, ready to attach to a GitHub release if you prefer manual distribution; uLauncher can also install directly from the repository URL.
 
 ## License
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
