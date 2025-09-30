@@ -1,10 +1,11 @@
 # UL Joplin Note Search for uLauncher
 
-Joplin Note Search lets you browse and create notes in [Joplin](https://joplinapp.org/) directly from the uLauncher prompt by talking to the Web Clipper API.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-%F0%9F%8D%BA-FFDD00?logo=buymeacoffee&logoColor=000)](https://www.buymeacoffee.com/mvleest.code)
 
-If this saves you a little time (or sparks ideas for your own workflow), consider fueling future updates with a coffee:
+Search, preview, and create notes in [Joplin](https://joplinapp.org/) straight from the uLauncher command bar. If this saves you a little time (or sparks ideas for your own workflow), consider fueling future updates with a coffee — it genuinely helps!
 
-<a href="https://www.buymeacoffee.com/mvleest.code" target="_blank">
+<a href="https://www.buymeacoffee.com/mvleest.code">
   <img
     src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
     alt="Buy Me A Coffee"
@@ -13,60 +14,76 @@ If this saves you a little time (or sparks ideas for your own workflow), conside
   />
 </a>
 
-## Features
-- Search Joplin notes with fuzzy matching and quick preview snippets
-- Create new notes inline with `+Title::Body` syntax
-- Open notes in the desktop app (Web Clipper command) or via the `joplin://` fallback
-- Configurable keyword, host, and API token via extension preferences
+## Highlights
+- 🔍 Fuzzy-search across Joplin notes with instant preview snippets
+- ✏️ Create notes inline using the `+Title::Body` shorthand
+- 🔗 Open notes via Web Clipper command with automatic `joplin://` fallback
+- ⚙️ Configure keyword, host, and API token from the extension preferences
 
 ## Requirements
 - [uLauncher](https://ulauncher.io/) v5 with extension API v2
-- [Joplin](https://joplinapp.org/) desktop app running on your machine with the Web Clipper service enabled
-- Joplin Web Clipper API token (Tools → Options → Web Clipper)
+- [Joplin](https://joplinapp.org/) desktop app running locally with the Web Clipper service enabled
+- Joplin Web Clipper API token (`Tools → Options → Web Clipper`)
 
-Make sure the Joplin desktop app stays open and the Web Clipper switch is turned on before invoking the extension.
+> ✅ Keep Joplin open and confirm the Web Clipper toggle is on before invoking the extension.
 
 ![Joplin Web Clipper settings showing service enabled and token](images/enablewebclipper.png)
 
 ## Installation
-1. Open uLauncher preferences → Extensions.
+### Install via GitHub URL (recommended)
+1. Open uLauncher preferences → **Extensions**.
 2. Click **Add extension** and paste `https://github.com/mvleest-code/UL-JoplinNoteSearch`.
-3. After it installs, open the extension directory at `~/.local/share/ulauncher/extensions/com.github.mvleest-code.ul-joplinnotesearch` (rename if needed).
-4. Set your desired keyword, API host, and paste the Web Clipper token.
+3. Open the new entry’s preferences and fill in the keyword, host, and API token.
 
-After saving the preferences, invoke uLauncher and type your keyword followed by a search query.
+### Manual install from ZIP (optional)
+1. Run `./scripts/package.sh` to generate `dist/ul-joplinnotesearch.zip`.
+2. Extract it into `~/.local/share/ulauncher/extensions/com.github.mvleest-code.ul-joplinnotesearch`.
+3. Restart uLauncher (or reload extensions) and configure the preferences.
 
 ![Extension settings showing configurable keyword, host, and token fields](images/settings.png)
 
 ## Usage
 - Search existing notes: `<keyword> your search terms`
-- Create a new note: `<keyword> +Title::Optional body`
-- Open a result: hit Enter on the desired note. If the Web Clipper command fails, the extension falls back to `joplin://` URLs.
-- Typing only the keyword keeps uLauncher waiting—add search text or a `+Title::Body` payload to trigger the extension.
+- Create a note inline: `<keyword> +Title::Optional body`
+- Open a result: press Enter — the extension tries the Web Clipper command first, then falls back to a `joplin://` URL if needed
+- Typing only the keyword keeps uLauncher waiting; add a query or `+Title::Body` payload to trigger actions
 
 ![Searching for a note from uLauncher](images/searchnote.png)
 
 ![Creating a note inline](images/addnote.png)
 
+## Troubleshooting
+- **No results / spinner forever** → Confirm Joplin is running and Web Clipper is enabled. Restart Joplin if the service was recently toggled.
+- **HTTP 403/401 errors** → The API token is missing or incorrect. Regenerate it in Joplin and update the extension preferences.
+- **Open note fails** → The note ID may not exist or Joplin refused the command; the extension automatically falls back to a `joplin://` link.
+- **Keyword does nothing** → The keyword field must be saved in uLauncher preferences. Reopen settings, enter your keyword (e.g., `note`), save, and try again.
+
+## Updates & Releases
+- The `manifest.json` `version` field tracks the release number. Bump it when shipping new behavior.
+- `versions.json` maps uLauncher’s API version to a specific commit SHA. Update it after pushing and tag a release (e.g., `v0.1.0`) so others can install a known-good snapshot.
+- Attach `dist/ul-joplinnotesearch.zip` to each GitHub release for users who prefer manual installs.
+
 ## Development
 ```bash
-# Install or link the extension in the local uLauncher directory
+# Link the extension into local uLauncher extensions
 mkdir -p ~/.local/share/ulauncher/extensions
 ln -s $(pwd) ~/.local/share/ulauncher/extensions/com.github.mvleest-code.ul-joplinnotesearch
 
-# Run ulauncher with logging for debugging
+# Launch uLauncher with verbose logging
 ulauncher -v
 ```
 
-Logs are written to `debug.log` (ignored in git).
-
-To prepare a release archive:
+Logs are written to `debug.log` in the project root (git-ignored). The packaging script regenerates the distributable archive:
 
 ```bash
 ./scripts/package.sh
 ```
 
-The script creates `dist/ul-joplinnotesearch.zip`, ready to attach to a GitHub release if you prefer manual distribution; uLauncher can also install directly from the repository URL.
+## Contributing
+Issues, feature ideas, and pull requests are welcome! A `CONTRIBUTING.md` and issue templates are on the roadmap — in the meantime, open an issue with as much context as possible and I’ll gladly collaborate.
+
+## Support
+If you hit a snag or have questions, open a GitHub issue with the relevant `debug.log` excerpt and environment details (uLauncher version, Joplin version, OS). I respond as quickly as I can.
 
 ## License
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
