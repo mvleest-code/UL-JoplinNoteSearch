@@ -3,16 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-%F0%9F%8D%BA-FFDD00?logo=buymeacoffee&logoColor=000)](https://www.buymeacoffee.com/mvleest.code)
 
-Search, preview, and create notes in [Joplin](https://joplinapp.org/) straight from the uLauncher command bar. If this saves you a little time (or sparks ideas for your own workflow), consider fueling future updates with a coffee — it genuinely helps!
-
-<a href="https://www.buymeacoffee.com/mvleest.code">
-  <img
-    src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
-    alt="Buy Me A Coffee"
-    height="60"
-    width="217"
-  />
-</a>
+Search, preview, and create notes in [Joplin](https://joplinapp.org/) straight from the uLauncher command bar.
 
 ## Highlights
 - 🔍 Fuzzy-search across Joplin notes with instant preview snippets
