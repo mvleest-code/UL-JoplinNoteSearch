@@ -1,0 +1,9 @@
+# Keep repository text files consistent across operating systems
+* text=auto
+
+*.md text eol=lf
+*.py text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf

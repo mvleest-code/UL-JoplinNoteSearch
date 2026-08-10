@@ -21,29 +21,17 @@ from ulauncher.api.shared.action.OpenUrlAction import OpenUrlAction
 from ulauncher.api.shared.action.ExtensionCustomAction import ExtensionCustomAction
 from ulauncher.api.shared.action.HideWindowAction import HideWindowAction
 
+from helpers import format_snippet, normalize_host, parse_note_payload, sanitize_url
+
 
 ICON_PATH = "images/icon.png"
 SEARCH_LIMIT = 10
 TIMEOUT_SECONDS = 3
-SNIPPET_MAX_LENGTH = 120
 DEFAULT_HOST = "http://127.0.0.1:41184"
 
 
 DEBUG_LOG = Path(__file__).with_name("debug.log")
 _LOGGER = None
-
-
-def _sanitize_url(url: str) -> str:
-    if not url:
-        return url
-    if "token=" not in url:
-        return url
-    prefix, rest = url.split("token=", 1)
-    token_tail = rest.split("&", 1)
-    masked = "***"
-    if len(token_tail) == 1:
-        return f"{prefix}token={masked}"
-    return f"{prefix}token={masked}&{token_tail[1]}"
 
 
 def _get_logger():
@@ -107,13 +95,6 @@ def _log_event(event, **fields):
 _log_event("module_loaded")
 
 
-def _format_snippet(text):
-    normalized = " ".join((text or "").split())
-    if len(normalized) > SNIPPET_MAX_LENGTH:
-        normalized = normalized[: SNIPPET_MAX_LENGTH - 1].rstrip() + "..."
-    return normalized
-
-
 def _fetch_json(url, *, method="GET", payload=None):
     data = None
     headers = {}
@@ -121,7 +102,7 @@ def _fetch_json(url, *, method="GET", payload=None):
         data = json.dumps(payload).encode("utf-8")
         headers["Content-Type"] = "application/json"
 
-    _log_event("fetch", method=method, url=_sanitize_url(url))
+    _log_event("fetch", method=method, url=sanitize_url(url))
     request = Request(url, data=data, headers=headers, method=method)
     with urlopen(request, timeout=TIMEOUT_SECONDS) as response:
         body = response.read().decode("utf-8")
@@ -176,13 +157,6 @@ def _open_note_url(note_id):
     return HideWindowAction()
 
 
-def _parse_note_payload(raw_text):
-    parts = raw_text.split("::", 1)
-    title = parts[0].strip() if parts else ""
-    body = parts[1].strip() if len(parts) > 1 else ""
-    return title or "Untitled note", body
-
-
 def _missing_token_item():
     return ExtensionResultItem(
         icon=ICON_PATH,
@@ -220,7 +194,10 @@ class KeywordQueryEventListener(EventListener):
     def on_event(self, event, extension):
         query = (event.get_argument() or "").strip()
         _log_event("keyword_event", length=len(query))
-        host = (extension.preferences.get("joplin_host") or DEFAULT_HOST).rstrip("/")
+        try:
+            host = normalize_host(extension.preferences.get("joplin_host"), DEFAULT_HOST)
+        except ValueError as exc:
+            return RenderResultListAction([_error_item("Invalid Joplin host", str(exc))])
         token = (extension.preferences.get("joplin_token") or "").strip()
 
         if not query:
@@ -243,8 +220,8 @@ class KeywordQueryEventListener(EventListener):
                     )
                 ])
 
-            title, body = _parse_note_payload(note_text)
-            description = _format_snippet(body) or "Press Enter to create this note in Joplin"
+            title, body = parse_note_payload(note_text)
+            description = format_snippet(body) or "Press Enter to create this note in Joplin"
             return RenderResultListAction([
                 ExtensionResultItem(
                     icon=ICON_PATH,
@@ -291,7 +268,7 @@ class KeywordQueryEventListener(EventListener):
         for note in notes:
             title = note.get("title") or "Untitled note"
             snippet_source = note.get("excerpt") or note.get("body", "")
-            description = _format_snippet(snippet_source) or f"Notebook ID: {note.get('parent_id', 'unknown')}"
+            description = format_snippet(snippet_source) or f"Notebook ID: {note.get('parent_id', 'unknown')}"
             note_id = note.get("id")
             on_enter = None
             if note_id:
@@ -320,7 +297,10 @@ class ItemEnterEventListener(EventListener):
 
         action_type = data.get("type")
 
-        host = (extension.preferences.get("joplin_host") or DEFAULT_HOST).rstrip("/")
+        try:
+            host = normalize_host(extension.preferences.get("joplin_host"), DEFAULT_HOST)
+        except ValueError as exc:
+            return RenderResultListAction([_error_item("Invalid Joplin host", str(exc))])
         token = (extension.preferences.get("joplin_token") or "").strip()
 
         if action_type == "open-note":
@@ -373,7 +353,7 @@ class ItemEnterEventListener(EventListener):
             return RenderResultListAction([_error_item("Unexpected error", str(exc))])
 
         note_id = (created_note or {}).get("id")
-        description = _format_snippet(body) or "Saved using the Web Clipper API"
+        description = format_snippet(body) or "Saved using the Web Clipper API"
         on_enter = OpenUrlAction(f"joplin://x-callback-url/openNote?id={note_id}") if note_id else None
 
         return RenderResultListAction([

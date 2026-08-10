@@ -1,9 +1,12 @@
 # Python cache
 __pycache__/
 *.py[cod]
+.coverage
+.pytest_cache/
 
 # Logs
 *.log
+*.log.*
 
 # Release artifacts
 dist/
@@ -12,4 +15,21 @@ scripts/release.sh
 # Editors
 .idea/
 .vscode/
+
+# Local history and scratch files
+.lh/
+.history/
+tmp.json
+
+# Virtual environments and local configuration
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+
+# Operating-system metadata
+.DS_Store
+Thumbs.db
+Desktop.ini
 

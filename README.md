@@ -1,67 +1,123 @@
-# UL Joplin Note Search for uLauncher
+# Joplin Note Search for Ulauncher
 
+[![Tests](https://github.com/mvleest-code/UL-JoplinNoteSearch/actions/workflows/tests.yml/badge.svg)](https://github.com/mvleest-code/UL-JoplinNoteSearch/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-%F0%9F%8D%BA-FFDD00?logo=buymeacoffee&logoColor=000)](https://www.buymeacoffee.com/mvleest.code)
 
-Search, preview, and create notes in [Joplin](https://joplinapp.org/) straight from the uLauncher command bar.
+Search, preview and create Joplin notes from the Ulauncher command bar. The
+extension integrates with Joplin's existing Web Clipper API; it does not run a
+separate note service or store a second copy of your notes.
 
-## Highlights
-- 🔍 Fuzzy-search across Joplin notes with instant preview snippets
-- ✏️ Create notes inline using the `+Title::Body` shorthand
-- 🔗 Open notes via Web Clipper command with automatic `joplin://` fallback
-- ⚙️ Configure keyword, host, and API token from the extension preferences
+This is a small personal integration project. It demonstrates API consumption,
+configuration, user-facing error handling and support-oriented diagnostics.
+
+## What it does
+
+- Fuzzy-searches Joplin notes and shows short result previews.
+- Creates a note using the `+Title::Body` shorthand.
+- Opens a note through a Web Clipper command with a `joplin://` fallback.
+- Lets users configure the keyword, Web Clipper host and API token.
+- Writes rotating diagnostic logs with API tokens masked.
+
+![Searching for a note from Ulauncher](images/searchnote.png)
+
+## Integration flow
+
+```text
+Ulauncher query
+      |
+      v
+Joplin Note Search extension
+      |
+      | HTTP request with local API token
+      v
+Joplin Web Clipper API (default: 127.0.0.1:41184)
+      |
+      v
+Search results, created note or a user-facing error
+```
+
+The default connection stays on the local machine. A custom host must be a
+complete `http://` or `https://` URL. Do not send a Web Clipper token to a host
+you do not control.
 
 ## Requirements
-- [uLauncher](https://ulauncher.io/) v5 with extension API v2
-- [Joplin](https://joplinapp.org/) desktop app running locally with the Web Clipper service enabled
-- Joplin Web Clipper API token (`Tools → Options → Web Clipper`)
 
-> ✅ Keep Joplin open and confirm the Web Clipper toggle is on before invoking the extension.
+- [Ulauncher](https://ulauncher.io/) v5 with extension API v2
+- [Joplin](https://joplinapp.org/) desktop running with Web Clipper enabled
+- A Joplin Web Clipper token from `Tools -> Options -> Web Clipper`
 
-![Joplin Web Clipper settings showing service enabled and token](images/enablewebclipper.png)
+![Joplin Web Clipper settings](images/enablewebclipper.png)
 
 ## Installation
-### Install via GitHub URL (recommended)
-1. Open uLauncher preferences → **Extensions**.
-2. Click **Add extension** and paste `https://github.com/mvleest-code/UL-JoplinNoteSearch`.
-3. Open the new entry’s preferences and fill in the keyword, host, and API token.
 
-![Extension settings showing configurable keyword, host, and token fields](images/settings.png)
+1. Open Ulauncher preferences and select **Extensions**.
+2. Select **Add extension**.
+3. Paste `https://github.com/mvleest-code/UL-JoplinNoteSearch`.
+4. Configure the keyword, host and Joplin token in the extension preferences.
+
+![Extension settings](images/settings.png)
 
 ## Usage
-- Search existing notes: `<keyword> your search terms`
-- Create a note inline: `<keyword> +Title::Optional body`
-- Open a result: press Enter — the extension tries the Web Clipper command first, then falls back to a `joplin://` URL if needed
-- Typing only the keyword keeps uLauncher waiting; add a query or `+Title::Body` payload to trigger actions
-- Debug logging is always on (writes JSON lines to `debug.log` next to `main.py`, rotated every 30 minutes with ~2.5 hours of history and tokens masked)
 
-![Searching for a note from uLauncher](images/searchnote.png)
+- Search: `<keyword> your search terms`
+- Create: `<keyword> +Title::Optional body`
+- Open: press Enter on a search result
 
-![Creating a note inline](images/addnote.png)
+![Creating a note](images/addnote.png)
 
 ## Troubleshooting
-- **No results / spinner forever** → Confirm Joplin is running and Web Clipper is enabled. Restart Joplin if the service was recently toggled.
-- **HTTP 403/401 errors** → The API token is missing or incorrect. Regenerate it in Joplin and update the extension preferences.
-- **Open note fails** → The note ID may not exist or Joplin refused the command; the extension automatically falls back to a `joplin://` link.
-- **Keyword does nothing** → The keyword field must be saved in uLauncher preferences. Reopen settings, enter your keyword (e.g., `note`), save, and try again.
-- **Need fewer logs?** → Delete `debug.log`; it is recreated automatically and rotation keeps only the last few files (~2.5 hours).
 
-***
+| Symptom | Likely cause | Check |
+| --- | --- | --- |
+| No results or connection error | Joplin or Web Clipper is not running | Open Joplin and confirm Web Clipper is enabled |
+| HTTP 401 or 403 | Missing, expired or incorrect token | Regenerate the token and update preferences |
+| Invalid Joplin host | Incomplete URL or query parameters in the host field | Use a complete URL such as `http://127.0.0.1:41184` |
+| Note does not open | Web Clipper rejected the command | The extension automatically tries the `joplin://` fallback |
+| Keyword does nothing | Preference was not saved | Save the keyword and reopen Ulauncher |
+
+When reporting a problem, include the Ulauncher, Joplin and OS versions. Review
+and redact diagnostic logs before sharing them. See [SECURITY.md](SECURITY.md).
+
+## Diagnostics and privacy
+
+`debug.log` is written next to `main.py` and rotates every 30 minutes. Five
+backups are kept. Request URLs are sanitized before logging and token query
+values are masked. Logs can still contain hostnames, note identifiers, titles
+entered while creating notes and error messages. Delete `debug.log*` whenever
+you no longer need the diagnostic history.
 
 ## Development
-```bash
-# Link the extension into local uLauncher extensions
-mkdir -p ~/.local/share/ulauncher/extensions
-ln -s $(pwd) ~/.local/share/ulauncher/extensions/com.github.mvleest-code.ul-joplinnotesearch
 
-# Launch uLauncher with verbose logging
+```bash
+# Link the repository into the local Ulauncher extension directory
+mkdir -p ~/.local/share/ulauncher/extensions
+ln -s "$(pwd)" ~/.local/share/ulauncher/extensions/com.github.mvleest-code.ul-joplinnotesearch
+
+# Run the dependency-free unit tests
+python -m unittest discover -s tests -v
+
+# Start Ulauncher with verbose output
 ulauncher -v
 ```
 
-Logs are written to `debug.log` in the project root (git-ignored).
+The unit tests cover URL redaction, host validation and input parsing. GitHub
+Actions runs them on Python 3.10, 3.11 and 3.12. Ulauncher/Joplin behaviour still
+requires a manual integration check because those desktop applications are not
+part of the test environment.
 
-## Support
-If you hit a snag or have questions, open a GitHub issue with the relevant `debug.log` excerpt and environment details (uLauncher version, Joplin version, OS). I respond as quickly as I can.
+## Known limitations
+
+- Joplin must be running for Web Clipper calls to succeed.
+- Search returns at most ten results.
+- API calls use a three-second timeout and do not currently retry.
+- The extension targets Ulauncher v5/API v2.
+
+## Support and security
+
+Open a GitHub issue for normal bugs and questions. Do not post API tokens, note
+contents or unredacted logs. Follow [SECURITY.md](SECURITY.md) for sensitive
+reports.
 
 ## License
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
+Licensed under the [MIT License](LICENSE).
